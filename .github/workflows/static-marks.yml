@@ -1,0 +1,20 @@
+name: Test of static-marks-action
+
+on:
+  push
+
+jobs:
+  generate-bookmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+        with:
+          persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run static-marks
+        uses: ./.github/actions/static-marks
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test that expected bookmarks.html file exists
+        run: test -s bookmarks.html
+        shell: bash

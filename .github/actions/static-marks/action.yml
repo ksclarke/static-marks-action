@@ -1,0 +1,54 @@
+name: 'static-marks-action'
+description: 'Generates and commits an HTML bookmarks file'
+inputs:
+  bookmarks_file:
+    description: 'A source YAML file'
+    required: false
+    default: 'bookmarks.yml'
+  html_file:
+    description: 'The output HTML file'
+    required: false
+    default: 'bookmarks.html'
+  commit_message:
+    description: 'The commit message'
+    required: false
+    default: 'Update HTML bookmarks file'
+  commit_user:
+    description: 'The user name associated with the commit'
+    required: false
+    default: 'github-actions[bot]'
+  commit_email:
+    description: 'The email associated with the commit'
+    required: false
+    default: '41898282+github-actions[bot]@users.noreply.github.com'
+  github_token:
+    description: 'The GITHUB_TOKEN used for repository access'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+      with:
+        persist-credentials: false
+        token: ${{ inputs.github_token }}
+    - name: Reformat repository URL, if necessary
+      run: 'git config url.https://github.com/.insteadOf git@github.com:'
+      shell: bash
+    - name: Generate an HTML bookmarks file
+      run: npx -s static-marks@2.4.1 build ${{ inputs.bookmarks_file }} > ${{ inputs.html_file }}
+      shell: bash
+    - name: Commit changes to HTML bookmarks file
+      run: |
+        git config user.name "${{ inputs.commit_user }}"
+        git config user.email "${{ inputs.commit_email }}"
+        git add ${{ inputs.html_file }}
+        git commit -m "${{ inputs.commit_message }}"
+      shell: bash
+    - name: Push bookmarks HTML file to GitHub
+      if: ${{ !env.ACT }}
+      uses: ad-m/github-push-action@40bf560936a8022e68a3c00e7d2abefaf01305a6 # v0.6.0
+      with:
+        github_token: ${{ inputs.github_token }}
+        branch: ${{ github.ref }}
+        
