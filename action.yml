@@ -45,10 +45,13 @@ runs:
         git add ${{ inputs.html_file }}
         git commit -m "${{ inputs.commit_message }}"
       shell: bash
+    - run: ls -l
+      shell: bash
+      if: ${{ !env.ACT }}
     - name: Push bookmarks HTML file to GitHub
       if: ${{ !env.ACT }}
       uses: ad-m/github-push-action@40bf560936a8022e68a3c00e7d2abefaf01305a6 # v0.6.0
       with:
         github_token: ${{ inputs.github_token }}
         branch: ${{ github.ref }}
-        
+
