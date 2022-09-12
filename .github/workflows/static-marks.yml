@@ -12,7 +12,7 @@ jobs:
           persist-credentials: false
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run static-marks
-        uses: ./.github/actions/static-marks
+        uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Test that expected bookmarks.html file exists
