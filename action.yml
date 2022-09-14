@@ -1,5 +1,9 @@
 name: 'static-marks-action'
 description: 'Generates and commits an HTML bookmarks file'
+
+env:
+  STATIC_MARKS_VERSION: '2.4.1'
+
 inputs:
   bookmarks_file:
     description: 'A source YAML file'
@@ -36,18 +40,15 @@ runs:
       run: 'git config url.https://github.com/.insteadOf git@github.com:'
       shell: bash
     - name: Generate an HTML bookmarks file
-      run: npx -s static-marks@2.4.1 build ${{ inputs.bookmarks_file }} > ${{ inputs.html_file }}
+      run: npx -s static-marks@$STATIC_MARKS_VERSION build ${{ inputs.bookmarks_file }} > ${{ inputs.html_file }}
       shell: bash
     - name: Commit changes to HTML bookmarks file
       run: |
         git config user.name "${{ inputs.commit_user }}"
         git config user.email "${{ inputs.commit_email }}"
         git add ${{ inputs.html_file }}
-        git commit -m "${{ inputs.commit_message }}"
+        git diff-index --quiet HEAD -- ${{ inputs.html_file }} || git commit -m "${{ inputs.commit_message }}"
       shell: bash
-    - run: ls -l
-      shell: bash
-      if: ${{ !env.ACT }}
     - name: Push bookmarks HTML file to GitHub
       if: ${{ !env.ACT }}
       uses: ad-m/github-push-action@40bf560936a8022e68a3c00e7d2abefaf01305a6 # v0.6.0
