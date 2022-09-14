@@ -49,10 +49,8 @@ runs:
         git add ${{ inputs.html_file }}
         git diff-index --quiet HEAD -- ${{ inputs.html_file }} || git commit -m "${{ inputs.commit_message }}"
       shell: bash
-    - run: echo "${{ github.ref }}"
-      shell: bash
     - name: Push bookmarks HTML file to GitHub
-      if: ${{ env.ACT }}
+      if: ${{ (!env.ACT) && (github.event_name != 'pull_request') }}
       uses: ad-m/github-push-action@40bf560936a8022e68a3c00e7d2abefaf01305a6 # v0.6.0
       with:
         github_token: ${{ inputs.github_token }}
